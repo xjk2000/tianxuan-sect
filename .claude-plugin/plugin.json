@@ -22,7 +22,7 @@
   ],
   "commands": [
     "./commands/init-tianxuan.md",
-    "./commands/项目加载.md",
+    "./commands/灵脉勘查.md",
     "./commands/task-status.md",
     "./commands/archive-task.md"
   ],

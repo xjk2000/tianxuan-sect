@@ -51,7 +51,7 @@ This creates the TianXuan Sect directory structure:
 │   ├── 已完成/        # Completed
 │   └── 计划/          # Plans
 ├── 藏经阁/            # Scripture Library (Knowledge Base)
-│   ├── 技术文档/      # Technical Docs
+│   ├── 功法大全/      # Cultivation Methods (Technical Docs)
 │   └── 最佳实践/      # Best Practices
 ├── 执法堂/            # Law Enforcement Hall (Test Reports)
 └── 丹堂/              # Alchemy Hall (Data Analysis)

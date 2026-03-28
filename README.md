@@ -20,13 +20,13 @@
 
 ### 天玄宗山门
 
-![天玄宗山门](images/tianxuan.png)
+![天玄宗山门](images/zongmen.png)
 
 *云雾缭绕的天玄宗山门，七位长老在此协作，共同守护代码质量*
 
 ### 宗门大殿
 
-![宗门大殿](images/zongmen.png)
+![宗门大殿](images/tianxuan.png)
 
 *宗门议事大殿，宗主在此统筹全局，各堂长老分工协作*
 

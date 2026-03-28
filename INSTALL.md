@@ -26,6 +26,8 @@ cd tianxuan-sect
 在 Claude Code 中运行：
 
 ```bash
+# 安装插件market
+/plugin marketplace add /path/to/tianxuan-sect
 # 添加本地插件
 /plugin add /path/to/tianxuan-sect
 ```

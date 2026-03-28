@@ -21,10 +21,10 @@
     "宗门"
   ],
   "commands": [
-    "./commands/init-tianxuan.md",
+    "./commands/宗门初始化.md",
     "./commands/灵脉勘查.md",
-    "./commands/task-status.md",
-    "./commands/archive-task.md"
+    "./commands/任务查询.md",
+    "./commands/任务归档.md"
   ],
   "agents": [
     "./agents/宗主.md",

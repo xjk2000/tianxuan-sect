@@ -1,0 +1,197 @@
+---
+name: archive-task
+description: 归档已完成的任务（由宗主调用）
+argument-hint: <taskId>
+disable-model-invocation: true
+---
+
+# 归档任务
+
+## 命令说明
+
+归档已完成的任务（由宗主调用）。
+
+## 触发条件
+
+执法堂两阶段测试通过后，宗主调用此命令。
+
+## 执行步骤
+
+### 1. 验证任务状态
+
+```bash
+TASK_ID=$1
+
+if [ -z "$TASK_ID" ]; then
+  echo "❌ 请指定任务ID"
+  echo "用法: /archive-task <taskId>"
+  exit 1
+fi
+
+STATUS_FILE="天玄宗/宗门任务榜/$TASK_ID/.task-status.json"
+
+if [ ! -f "$STATUS_FILE" ]; then
+  echo "❌ 任务不存在: $TASK_ID"
+  exit 1
+fi
+
+# 检查执法堂是否完成
+ZFT_STATUS=$(jq -r '.tasks.执法堂.status' "$STATUS_FILE")
+if [ "$ZFT_STATUS" != "completed" ]; then
+  echo "❌ 执法堂测试未完成，无法归档"
+  exit 1
+fi
+```
+
+### 2. 合并分支
+
+```bash
+BRANCH=$(jq -r '.branch' "$STATUS_FILE")
+
+echo "📦 合并分支: $BRANCH"
+
+# 获取当前分支
+CURRENT_BRANCH=$(git branch --show-current)
+
+# 切换到主分支
+git checkout main
+
+# 合并任务分支
+git merge "$BRANCH" --no-ff -m "完成任务: $TASK_ID"
+
+if [ $? -ne 0 ]; then
+  echo "❌ 分支合并失败，请手动处理冲突"
+  git checkout "$CURRENT_BRANCH"
+  exit 1
+fi
+
+# 删除任务分支
+git branch -d "$BRANCH"
+
+echo "✅ 分支已合并并删除"
+```
+
+### 3. 移动到归档
+
+```bash
+echo "📁 归档任务文件"
+
+mv "天玄宗/宗门任务榜/$TASK_ID" "天玄宗/藏经阁/归档/"
+
+if [ $? -ne 0 ]; then
+  echo "❌ 归档失败"
+  exit 1
+fi
+
+echo "✅ 任务已归档到: 天玄宗/藏经阁/归档/$TASK_ID/"
+```
+
+### 4. 生成经验总结（可选）
+
+```bash
+echo "📝 生成经验总结"
+
+SUMMARY_FILE="天玄宗/藏经阁/项目经验/${TASK_ID}-总结.md"
+
+cat > "$SUMMARY_FILE" <<EOF
+# $TASK_ID 项目总结
+
+**完成时间**: $(date +"%Y-%m-%d %H:%M")
+**归档路径**: /天玄宗/藏经阁/归档/$TASK_ID/
+
+## 任务概述
+
+[从任务总览.md提取]
+
+## 技术选型
+
+- 后端: [技术栈]
+- 前端: [技术栈]
+- 数据库: [技术栈]
+
+## 关键经验
+
+1. [经验1]
+2. [经验2]
+3. [经验3]
+
+## 踩坑记录
+
+1. **问题**: [问题描述]
+   **原因**: [根因分析]
+   **解决**: [解决方案]
+
+2. **问题**: [问题描述]
+   **原因**: [根因分析]
+   **解决**: [解决方案]
+
+## 最佳实践
+
+1. [最佳实践1]
+2. [最佳实践2]
+
+## 参考资料
+
+- [相关文档路径]
+
+EOF
+
+echo "✅ 经验总结已生成: $SUMMARY_FILE"
+```
+
+### 5. 更新藏经阁索引
+
+```bash
+echo "📚 更新藏经阁索引"
+
+cat >> 天玄宗/藏经阁/INDEX.md <<EOF
+
+### $TASK_ID 项目总结
+- 路径: \`/天玄宗/藏经阁/项目经验/${TASK_ID}-总结.md\`
+- 关键词: [从任务中提取关键词]
+- 更新时间: $(date +"%Y-%m-%d")
+
+EOF
+
+echo "✅ 索引已更新"
+```
+
+### 6. 输出归档报告
+
+```bash
+echo ""
+echo "✅ 任务归档完成！"
+echo ""
+echo "**任务编号**: $TASK_ID"
+echo "**完成时间**: $(date +"%Y-%m-%d %H:%M")"
+echo "**归档路径**: /天玄宗/藏经阁/归档/$TASK_ID/"
+echo "**经验总结**: $SUMMARY_FILE"
+echo ""
+echo "各堂执行情况:"
+
+# 读取各堂状态
+ZJG_STATUS=$(jq -r '.tasks.藏经阁.status' "天玄宗/藏经阁/归档/$TASK_ID/.task-status.json")
+ZT_STATUS=$(jq -r '.tasks.阵堂.status' "天玄宗/藏经阁/归档/$TASK_ID/.task-status.json")
+QT_STATUS=$(jq -r '.tasks.器堂.status' "天玄宗/藏经阁/归档/$TASK_ID/.task-status.json")
+ZFT_STATUS=$(jq -r '.tasks.执法堂.status' "天玄宗/藏经阁/归档/$TASK_ID/.task-status.json")
+
+echo "- 藏经阁: $([ "$ZJG_STATUS" = "completed" ] && echo "✅ 已完成" || echo "❓ $ZJG_STATUS")"
+echo "- 阵堂: $([ "$ZT_STATUS" = "completed" ] && echo "✅ 已完成" || echo "❓ $ZT_STATUS")"
+echo "- 器堂: $([ "$QT_STATUS" = "completed" ] && echo "✅ 已完成" || echo "❓ $QT_STATUS")"
+echo "- 执法堂: $([ "$ZFT_STATUS" = "completed" ] && echo "✅ 两阶段测试通过" || echo "❓ $ZFT_STATUS")"
+echo ""
+```
+
+## 使用示例
+
+```bash
+# 归档指定任务
+/archive-task 2026-03-28-user-system
+```
+
+## 注意事项
+
+1. 只能归档执法堂测试通过的任务
+2. 归档前会自动合并分支
+3. 归档后会生成经验总结
+4. 归档后会更新藏经阁索引

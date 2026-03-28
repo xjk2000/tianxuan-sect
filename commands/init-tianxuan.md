@@ -1,0 +1,191 @@
+---
+name: init-tianxuan
+description: 初始化天玄宗项目结构和配置文件
+disable-model-invocation: true
+---
+
+# 初始化天玄宗项目
+
+## 命令说明
+
+初始化天玄宗项目结构和配置文件。
+
+## 执行步骤
+
+### 1. 检查当前目录
+
+```bash
+if [ -d "天玄宗" ]; then
+  echo "⚠️ 天玄宗目录已存在"
+  read -p "是否覆盖？(y/n): " confirm
+  if [ "$confirm" != "y" ]; then
+    echo "❌ 初始化已取消"
+    exit 1
+  fi
+  rm -rf 天玄宗
+fi
+```
+
+### 2. 创建目录结构
+
+```bash
+mkdir -p 天玄宗/{宗门任务榜,藏经阁/{归档,第三方平台,项目经验,技术总结},丹堂/查询脚本,阵堂/临时文件,器堂/临时文件,执法堂/测试脚本}
+```
+
+### 3. 创建索引文件
+
+```bash
+cat > 天玄宗/藏经阁/INDEX.md <<'EOF'
+# 藏经阁索引
+
+最后更新: $(date +"%Y-%m-%d")
+
+## 第三方平台
+
+## 项目经验
+
+## 技术总结
+
+EOF
+```
+
+### 4. 创建配置文件模板
+
+```bash
+cat > 天玄宗/.tianxuan.config.json <<'EOF'
+{
+  "version": "1.0",
+  "agents": {
+    "宗主": {
+      "model": {
+        "primary": "sonnet-4",
+        "fallbacks": ["sonnet-3.5"]
+      },
+      "effort": "high",
+      "maxTurns": 30,
+      "skills": ["tianxuan-brainstorming", "tianxuan-task-decompose"],
+      "tools": ["Agent", "Read", "Write", "Edit", "Bash", "Grep"]
+    },
+    "藏经阁长老": {
+      "model": {
+        "primary": "sonnet-3.5",
+        "fallbacks": []
+      },
+      "effort": "medium",
+      "maxTurns": 20,
+      "skills": ["tianxuan-doc-search"],
+      "tools": ["Read", "Write", "Web", "Grep", "Edit"]
+    },
+    "丹堂长老": {
+      "model": {
+        "primary": "haiku-3.5",
+        "fallbacks": []
+      },
+      "effort": "low",
+      "maxTurns": 10,
+      "tools": ["Read", "Bash", "Grep"]
+    },
+    "阵堂长老": {
+      "model": {
+        "primary": "sonnet-3.5",
+        "fallbacks": []
+      },
+      "effort": "medium",
+      "maxTurns": 25,
+      "skills": ["tianxuan-self-review", "tianxuan-藏经阁优先"],
+      "tools": ["Read", "Write", "Edit", "Bash"]
+    },
+    "器堂长老": {
+      "model": {
+        "primary": "sonnet-3.5",
+        "fallbacks": []
+      },
+      "effort": "medium",
+      "maxTurns": 25,
+      "skills": ["tianxuan-self-review", "tianxuan-藏经阁优先"],
+      "tools": ["Read", "Write", "Edit", "Bash"]
+    },
+    "执法堂长老": {
+      "model": {
+        "primary": "sonnet-3.5",
+        "fallbacks": []
+      },
+      "effort": "medium",
+      "maxTurns": 30,
+      "skills": ["tianxuan-two-stage-review", "tianxuan-systematic-debugging"],
+      "tools": ["Read", "Write", "Bash"]
+    }
+  },
+  "taskDefaults": {
+    "enableSelfReview": true,
+    "enableTwoStageTest": true,
+    "maxFailureRetries": 3
+  }
+}
+EOF
+```
+
+### 5. 创建 README
+
+```bash
+cat > 天玄宗/README.md <<'EOF'
+# 天玄宗
+
+天玄宗是一个多 Agent 协作开发架构，通过专业分工实现高效的软件开发。
+
+## 目录说明
+
+- **宗门任务榜/**: 活跃任务目录
+- **藏经阁/**: 知识库
+  - **归档/**: 已完成任务归档
+  - **第三方平台/**: 第三方 API/SDK 文档
+  - **项目经验/**: 项目实施经验总结
+  - **技术总结/**: 技术栈最佳实践
+- **丹堂/**: 数据查询工作区
+- **阵堂/**: 后端开发工作区
+- **器堂/**: 前端开发工作区
+- **执法堂/**: 测试验收工作区
+
+## 使用方法
+
+1. 向宗主下达任务
+2. 宗主会进行需求探索（Brainstorming）
+3. 确认设计后，宗主创建任务并调度各堂
+4. 各堂按顺序执行任务
+5. 执法堂两阶段测试通过后归档
+
+## 配置文件
+
+- `.tianxuan.config.json`: 天玄宗配置文件
+- `INDEX.md`: 藏经阁知识索引
+
+EOF
+```
+
+### 6. 输出成功信息
+
+```bash
+echo ""
+echo "✅ 天玄宗项目初始化完成！"
+echo ""
+echo "目录结构:"
+echo "- 天玄宗/宗门任务榜/ (活跃任务)"
+echo "- 天玄宗/藏经阁/ (知识库)"
+echo "- 天玄宗/丹堂/ (数据查询)"
+echo "- 天玄宗/阵堂/ (后端工作区)"
+echo "- 天玄宗/器堂/ (前端工作区)"
+echo "- 天玄宗/执法堂/ (测试工作区)"
+echo ""
+echo "配置文件: 天玄宗/.tianxuan.config.json"
+echo "知识索引: 天玄宗/藏经阁/INDEX.md"
+echo ""
+echo "下一步: 向宗主下达任务即可开始协作开发"
+echo ""
+```
+
+## 使用示例
+
+```bash
+# 在项目根目录执行
+/init-tianxuan
+```

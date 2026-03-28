@@ -1,0 +1,31 @@
+{
+  "name": "tianxuan-sect-marketplace",
+  "description": "天玄宗修仙宗门多 Agent 协作架构插件市场",
+  "owner": {
+    "name": "XuJiaKai",
+    "email": "[email protected]"
+  },
+  "plugins": [
+    {
+      "name": "tianxuan-sect",
+      "description": "天玄宗修仙宗门多 Agent 协作架构 - 通用的软件开发协作系统，融合质量保证机制和知识管理",
+      "version": "1.0.0",
+      "source": "./",
+      "author": {
+        "name": "XuJiaKai",
+        "email": "[email protected]"
+      },
+      "keywords": [
+        "multi-agent",
+        "collaboration",
+        "development",
+        "workflow",
+        "quality-assurance",
+        "knowledge-management",
+        "chinese",
+        "修仙",
+        "宗门"
+      ]
+    }
+  ]
+}

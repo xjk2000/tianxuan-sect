@@ -1,0 +1,119 @@
+#!/usr/bin/env bash
+# SessionStart hook for 天玄宗 plugin
+# 在每次会话开始时注入天玄宗使用说明
+
+set -euo pipefail
+
+# 确定插件根目录
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+PLUGIN_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
+
+# 检查是否已初始化天玄宗
+warning_message=""
+if [ ! -d "天玄宗" ]; then
+    warning_message="\n\n<important-reminder>💡 **提示**: 项目尚未初始化天玄宗。请使用 \`/init-tianxuan\` 命令初始化项目结构。</important-reminder>"
+fi
+
+# 读取天玄宗使用说明
+tianxuan_intro=$(cat <<'EOF'
+# 天玄宗修仙宗门多 Agent 协作系统
+
+你现在拥有天玄宗的力量！这是一个专业的多 Agent 协作开发系统。
+
+## 核心角色
+
+- **宗主** - 需求探索、任务拆分、调度协调、验收归档
+- **藏经阁长老** - 知识管理、文档总结、经验沉淀
+- **丹堂长老** - 数据查询、日志分析、环境诊断
+- **阵堂长老** - 后端开发（任何后端技术栈）
+- **器堂长老** - 前端开发（任何前端技术栈）
+- **执法堂长老** - 测试验收、质量把关、缺陷诊断
+
+## 核心原则
+
+1. **HARD-GATE** - 宗主在用户确认设计前，禁止创建任务
+2. **No Placeholders** - 任务定义必须完整，禁止 "TBD"、"待定"
+3. **藏经阁优先** - 各堂开始前必须先查询藏经阁
+4. **Self-Review** - 各堂完成后执行自检清单
+5. **两阶段审查** - 执法堂先验证功能，再验证质量
+6. **3次失败机制** - 失败3次后质疑架构设计
+
+## 快速开始
+
+### 1. 初始化项目
+\`\`\`bash
+/init-tianxuan
+\`\`\`
+
+### 2. 下达任务
+\`\`\`
+@宗主 我想实现一个用户管理系统
+\`\`\`
+
+### 3. 宗主会引导你
+- 提问了解需求
+- 委派藏经阁调研
+- 提出设计方案
+- 分段展示设计
+- 等待你确认
+
+### 4. 确认后开始协作
+- 藏经阁：调研并存储文档
+- 阵堂：实现后端
+- 器堂：实现前端
+- 执法堂：两阶段测试
+- 宗主：验收归档
+
+## 可用技能
+
+- **需求探索术** - 宗主的需求探索技能
+- **藏经阁优先法** - 强制查询藏经阁
+- **自检心法** - 各堂的自检清单
+- **两阶段审查法** - 执法堂的测试流程
+- **系统化调试术** - 执法堂的调试方法
+- **Git工作流** - 分支管理规范
+- **代码审查诀** - 代码审查清单
+- **文档生成法** - 文档自动生成
+
+## 重要提醒
+
+- ✅ 始终遵循 HARD-GATE 原则
+- ✅ 任务定义必须完整（No Placeholders）
+- ✅ 各堂必须先查询藏经阁
+- ✅ 完成后必须执行 Self-Review
+- ❌ 不要跳过任何步骤
+- ❌ 不要让其他堂自行查询官方文档（必须由藏经阁）
+
+详细文档请查看项目 README.md
+EOF
+)
+
+# JSON 转义函数
+escape_for_json() {
+    local s="$1"
+    s="${s//\\/\\\\}"
+    s="${s//\"/\\\"}"
+    s="${s//$'\n'/\\n}"
+    s="${s//$'\r'/\\r}"
+    s="${s//$'\t'/\\t}"
+    printf '%s' "$s"
+}
+
+tianxuan_intro_escaped=$(escape_for_json "$tianxuan_intro")
+warning_escaped=$(escape_for_json "$warning_message")
+session_context="<EXTREMELY_IMPORTANT>\n你拥有天玄宗的力量！\n\n${tianxuan_intro_escaped}\n\n${warning_escaped}\n</EXTREMELY_IMPORTANT>"
+
+# 输出上下文注入
+# 支持 Claude Code 和 Cursor
+if [ -n "${CURSOR_PLUGIN_ROOT:-}" ]; then
+  # Cursor 平台
+  printf '{\n  "additional_context": "%s"\n}\n' "$session_context"
+elif [ -n "${CLAUDE_PLUGIN_ROOT:-}" ]; then
+  # Claude Code 平台
+  printf '{\n  "hookSpecificOutput": {\n    "hookEventName": "SessionStart",\n    "additionalContext": "%s"\n  }\n}\n' "$session_context"
+else
+  # 其他平台
+  printf '{\n  "additional_context": "%s"\n}\n' "$session_context"
+fi
+
+exit 0

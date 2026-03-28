@@ -1,0 +1,36 @@
+{
+  "name": "tianxuan-sect",
+  "version": "1.0.0",
+  "description": "天玄宗修仙宗门多 Agent 协作架构 - Claude Code 插件",
+  "keywords": [
+    "claude-code",
+    "plugin",
+    "multi-agent",
+    "collaboration",
+    "development",
+    "workflow",
+    "quality-assurance",
+    "knowledge-management"
+  ],
+  "author": {
+    "name": "XuJiaKai",
+    "email": "[email protected]"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/xjk2000/tianxuan-sect.git"
+  },
+  "bugs": {
+    "url": "https://github.com/xjk2000/tianxuan-sect/issues"
+  },
+  "homepage": "https://github.com/xjk2000/tianxuan-sect#readme",
+  "scripts": {
+    "test": "echo \"运行测试套件\" && exit 0",
+    "lint": "echo \"代码检查\" && exit 0",
+    "format": "echo \"代码格式化\" && exit 0"
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  }
+}

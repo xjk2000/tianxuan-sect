@@ -1,0 +1,19 @@
+# 天玄宗运行时生成的文件
+天玄宗/
+
+# Node modules (如果有)
+node_modules/
+
+# 日志文件
+*.log
+
+# 临时文件
+*.tmp
+.DS_Store
+
+# IDE 配置
+.vscode/
+.idea/
+
+# 用户配置（敏感信息）
+.tianxuan.config.local.json

@@ -25,7 +25,15 @@
     "./commands/task-status.md",
     "./commands/archive-task.md"
   ],
-  "agents": "./agents/",
+  "agents": [
+    "./agents/宗主.md",
+    "./agents/藏经阁长老.md",
+    "./agents/丹堂长老.md",
+    "./agents/阵堂长老.md",
+    "./agents/器堂长老.md",
+    "./agents/执法堂长老.md",
+    "./agents/杂役弟子.md"
+  ],
   "skills": "./skills/",
   "hooks": "./hooks/hooks.json"
 }

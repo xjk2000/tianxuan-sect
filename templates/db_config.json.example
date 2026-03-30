@@ -1,0 +1,10 @@
+{
+  "type": "mysql",
+  "host": "localhost",
+  "port": 3306,
+  "database": "your_database_name",
+  "user": "your_username",
+  "password": "your_password",
+  "charset": "utf8mb4",
+  "comment": "数据库连接配置文件 - 由宗主在灵脉勘查时创建"
+}

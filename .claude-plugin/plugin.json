@@ -1,6 +1,6 @@
 {
   "name": "tianxuan-sect",
-  "version": "1.0.0-02",
+  "version": "1.0.0-03",
   "description": "天玄宗修仙宗门多 Agent 协作架构 - 通用的软件开发协作系统",
   "author": {
     "name": "XuJiaKai",
@@ -25,6 +25,7 @@
     "./commands/灵脉勘查.md",
     "./commands/宗门新任务.md",
     "./commands/宗门任务继续.md",
+    "./commands/宗门任务推演.md",
     "./commands/任务查询.md",
     "./commands/任务归档.md"
   ],

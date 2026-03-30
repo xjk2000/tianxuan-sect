@@ -282,14 +282,6 @@
 
 ---
 
-## 🙏 致谢
-
-- 灵感来源于 [Superpowers](https://github.com/obra/superpowers)
-- 感谢 Claude Code 团队提供的插件平台
-- 感谢所有贡献者和用户
-
----
-
 ## 📧 联系
 
 - **作者**: XuJiaKai

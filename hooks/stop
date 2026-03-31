@@ -67,10 +67,8 @@ escape_for_json() {
 
 REMINDER_ESCAPED=$(escape_for_json "$REMINDER")
 
-if [ -n "${CLAUDE_PLUGIN_ROOT:-}" ]; then
-  printf '{\n  "hookSpecificOutput": {\n    "hookEventName": "Stop",\n    "additionalContext": "%s"\n  }\n}\n' "$REMINDER_ESCAPED"
-else
-  printf '{\n  "additional_context": "%s"\n}\n' "$REMINDER_ESCAPED"
-fi
+# Stop 事件仅支持顶层字段：continue, systemMessage, stopReason, decision, reason
+# 使用 continue:true + systemMessage 让 Claude 看到提醒后完成收尾工作
+printf '{\n  "continue": true,\n  "systemMessage": "%s"\n}\n' "$REMINDER_ESCAPED"
 
 exit 0

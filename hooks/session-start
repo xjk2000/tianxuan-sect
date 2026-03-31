@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # SessionStart hook for 天玄宗 plugin
-# 在每次会话开始时注入天玄宗使用说明
+# 在每次会话开始时注入天玄宗使用说明 + 道场回忆（历史观照与宗门记载）
 
 set -euo pipefail
 
@@ -12,6 +12,55 @@ PLUGIN_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
 warning_message=""
 if [ ! -d "天玄宗" ]; then
     warning_message="\n\n<important-reminder>💡 **提示**: 项目尚未初始化天玄宗。请使用 \`/init-tianxuan\` 命令初始化项目结构。</important-reminder>"
+fi
+
+# ===== 道场回忆：注入跨会话历史记忆 =====
+memory_section=""
+if [ -d "天玄宗" ]; then
+    SUMMARIES_FILE="天玄宗/宗门记载/SUMMARIES.md"
+    OBSERVATIONS_FILE="天玄宗/道行观照/OBSERVATIONS.md"
+    summaries_content=""
+    observations_content=""
+    obs_total=0
+    summary_total=0
+
+    # 宗门记载：精确读取最近 3 条完整内容（按 ## 📜 记载 分割）
+    if [ -f "$SUMMARIES_FILE" ] && [ -s "$SUMMARIES_FILE" ]; then
+        summary_total=$(grep -c "^## 📜 记载" "$SUMMARIES_FILE" 2>/dev/null || echo "0")
+        if [ "$summary_total" -gt 0 ]; then
+            summaries_content=$(awk '
+                /^## 📜 记载/ { if (block!="") { n++; blocks[n]=block }; block=$0; next }
+                { if (block!="") block=block"\n"$0 }
+                END { if (block!="") { n++; blocks[n]=block };
+                      start=(n>3)?n-2:1;
+                      for(i=start;i<=n;i++) { print blocks[i]; print "---" } }
+            ' "$SUMMARIES_FILE" 2>/dev/null || echo "")
+        fi
+    fi
+
+    # 道行观照：读取总数 + 最近 20 条的标题索引行（极省 token）
+    if [ -f "$OBSERVATIONS_FILE" ] && [ -s "$OBSERVATIONS_FILE" ]; then
+        obs_total=$(grep -c "^## #" "$OBSERVATIONS_FILE" 2>/dev/null || echo "0")
+        if [ "$obs_total" -gt 0 ]; then
+            # 只取标题行（## #编号 · 日期 · 长老 · 类型）和下一行（**标题**）
+            observations_content=$(grep -A1 "^## #" "$OBSERVATIONS_FILE" 2>/dev/null \
+                | grep -v "^--$" \
+                | tail -n 40 \
+                || echo "")
+        fi
+    fi
+
+    if [ -n "$summaries_content" ] || [ "$obs_total" -gt 0 ]; then
+        memory_section="\n\n## 🏯 道场回忆（跨会话持久记忆）\n\n"
+        memory_section="${memory_section}> 宗门记忆库：共 **${obs_total}** 条道行观照，**${summary_total}** 条宗门记载\n"
+        if [ -n "$summaries_content" ]; then
+            memory_section="${memory_section}\n### 📜 近期宗门记载（最近 3 条）\n\n${summaries_content}\n"
+        fi
+        if [ -n "$observations_content" ]; then
+            memory_section="${memory_section}\n### 🔮 道行观照索引（最近 20 条标题）\n\n${observations_content}\n"
+        fi
+        memory_section="${memory_section}\n> 💡 使用 **天玄记忆诀** skill 可按关键词深度检索\n"
+    fi
 fi
 
 # 读取天玄宗使用说明
@@ -68,6 +117,7 @@ tianxuan_intro=$(cat <<'EOF'
 
 - **需求探索术** - 宗主的需求探索技能
 - **藏经阁优先法** - 强制查询藏经阁
+- **天玄记忆诀** - 跨会话历史记忆检索（三层工作流）
 - **自检心法** - 各堂的自检清单
 - **两阶段审查法** - 执法堂的测试流程
 - **系统化调试术** - 执法堂的调试方法
@@ -81,6 +131,9 @@ tianxuan_intro=$(cat <<'EOF'
 - ✅ 任务定义必须完整（No Placeholders）
 - ✅ 各堂必须先查询藏经阁
 - ✅ 完成后必须执行 Self-Review
+- ✅ **各堂完成实质工作后必须生成 `<道行观照>` XML 并通知藏经阁存档**
+- ✅ **任务归档时宗主必须生成 `<宗门记载>` XML 并通知藏经阁存入记忆库**
+- ✅ **开始新任务或继续任务前，先用天玄记忆诀检索历史上下文**
 - ❌ 不要跳过任何步骤
 - ❌ 不要让其他堂自行查询官方文档（必须由藏经阁）
 
@@ -101,7 +154,8 @@ escape_for_json() {
 
 tianxuan_intro_escaped=$(escape_for_json "$tianxuan_intro")
 warning_escaped=$(escape_for_json "$warning_message")
-session_context="<EXTREMELY_IMPORTANT>\n你拥有天玄宗的力量！\n\n${tianxuan_intro_escaped}\n\n${warning_escaped}\n</EXTREMELY_IMPORTANT>"
+memory_escaped=$(escape_for_json "$memory_section")
+session_context="<EXTREMELY_IMPORTANT>\n你拥有天玄宗的力量！\n\n${tianxuan_intro_escaped}${memory_escaped}\n\n${warning_escaped}\n</EXTREMELY_IMPORTANT>"
 
 # 输出上下文注入
 # 支持 Claude Code 和 Cursor

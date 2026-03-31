@@ -1,7 +1,7 @@
 {
   "name": "tianxuan-sect",
-  "version": "1.0.0-06",
-  "description": "天玄宗修仙宗门多 Agent 协作架构 - 通用的软件开发协作系统",
+  "version": "1.0.0-08",
+  "description": "天玄宗修仙宗门多 Agent 协作架构 - 跨会话持久记忆 + 通用软件开发协作系统（道行观照 + 宗门记载）",
   "author": {
     "name": "XuJiaKai",
     "email": "[email protected]"
@@ -18,7 +18,11 @@
     "knowledge-management",
     "chinese",
     "修仙",
-    "宗门"
+    "宗门",
+    "memory",
+    "persistent-memory",
+    "道行观照",
+    "天玄记忆诀"
   ],
   "commands": [
     "./commands/宗门初始化.md",

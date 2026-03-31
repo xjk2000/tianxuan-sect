@@ -1,0 +1,45 @@
+#!/usr/bin/env bash
+# 道行记录符 - PostToolUse Hook
+# 每次写操作类工具调用后，将记录追加到待处理队列（为记忆守护者提供原始素材）
+# 只读工具（Read/Grep/Bash-查询）不记录，避免队列膨胀
+
+set -euo pipefail
+
+# 读取 stdin 输入
+INPUT=$(cat)
+
+# 纯 bash 提取工具名（不依赖 Python/jq）
+TOOL_NAME=$(printf '%s' "$INPUT" | grep -o '"tool_name":"[^"]*"' | head -1 | sed 's/"tool_name":"//;s/"//' 2>/dev/null || echo "unknown")
+
+# 只记录写操作类工具，过滤纯只读工具
+case "$TOOL_NAME" in
+  Read|Grep|LS|Search|WebSearch)
+    exit 0
+    ;;
+esac
+
+# 查找天玄宗目录（向上遍历）
+TIANXUAN_DIR=""
+CWD="$(pwd)"
+while [ "$CWD" != "/" ]; do
+  if [ -d "$CWD/天玄宗" ]; then
+    TIANXUAN_DIR="$CWD/天玄宗"
+    break
+  fi
+  CWD="$(dirname "$CWD")"
+done
+
+# 未初始化天玄宗则静默退出
+if [ -z "$TIANXUAN_DIR" ]; then
+  exit 0
+fi
+
+# 确保道行观照目录存在
+QUEUE_DIR="$TIANXUAN_DIR/道行观照"
+mkdir -p "$QUEUE_DIR"
+
+# 带时间戳追加到待处理队列（轻量 JSONL 格式，纯 bash 无外部依赖）
+TIMESTAMP=$(date +%s)
+printf '{"ts":%s,"tool":"%s"}\n' "$TIMESTAMP" "$TOOL_NAME" >> "$QUEUE_DIR/待处理队列.jsonl"
+
+exit 0

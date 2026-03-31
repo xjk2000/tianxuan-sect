@@ -1,0 +1,76 @@
+#!/usr/bin/env bash
+# 封存传法符 - Stop Hook
+# 会话结束时，若有工具调用记录，提醒宗主归档时生成宗门记载
+
+set -euo pipefail
+
+# 读取 stdin 输入
+INPUT=$(cat)
+
+# 查找天玄宗目录（向上遍历）
+TIANXUAN_DIR=""
+CWD="$(pwd)"
+while [ "$CWD" != "/" ]; do
+  if [ -d "$CWD/天玄宗" ]; then
+    TIANXUAN_DIR="$CWD/天玄宗"
+    break
+  fi
+  CWD="$(dirname "$CWD")"
+done
+
+# 未初始化天玄宗则静默退出
+if [ -z "$TIANXUAN_DIR" ]; then
+  exit 0
+fi
+
+# 检查待处理队列
+QUEUE_FILE="$TIANXUAN_DIR/道行观照/待处理队列.jsonl"
+TOOL_COUNT=0
+if [ -f "$QUEUE_FILE" ] && [ -s "$QUEUE_FILE" ]; then
+  TOOL_COUNT=$(wc -l < "$QUEUE_FILE" 2>/dev/null | tr -d ' ' || echo "0")
+fi
+
+# 检查本次会话是否已有新增道行观照
+OBS_FILE="$TIANXUAN_DIR/道行观照/OBSERVATIONS.md"
+TODAY=$(date +"%Y-%m-%d")
+TODAY_OBS=0
+if [ -f "$OBS_FILE" ]; then
+  TODAY_OBS=$(grep -c "^## #" "$OBS_FILE" 2>/dev/null | tr -d ' ' || echo "0")
+fi
+
+# 构建提醒内容
+REMINDER=""
+if [ "$TOOL_COUNT" -gt 0 ]; then
+  REMINDER="⚠️ **道场封存提醒**：本次会话累计 ${TOOL_COUNT} 次工具调用尚未生成道行观照。各堂长老完成工作后请在回复末尾附上 \`<道行观照>\` XML，并通知藏经阁长老存档。"
+fi
+
+if [ "$TODAY_OBS" -gt 0 ]; then
+  if [ -n "$REMINDER" ]; then
+    REMINDER="${REMINDER} 今日已记录 ${TODAY_OBS} 条道行观照。"
+  fi
+fi
+
+if [ -z "$REMINDER" ]; then
+  exit 0
+fi
+
+# JSON 转义
+escape_for_json() {
+    local s="$1"
+    s="${s//\\/\\\\}"
+    s="${s//\"/\\\"}"
+    s="${s//$'\n'/\\n}"
+    s="${s//$'\r'/\\r}"
+    s="${s//$'\t'/\\t}"
+    printf '%s' "$s"
+}
+
+REMINDER_ESCAPED=$(escape_for_json "$REMINDER")
+
+if [ -n "${CLAUDE_PLUGIN_ROOT:-}" ]; then
+  printf '{\n  "hookSpecificOutput": {\n    "hookEventName": "Stop",\n    "additionalContext": "%s"\n  }\n}\n' "$REMINDER_ESCAPED"
+else
+  printf '{\n  "additional_context": "%s"\n}\n' "$REMINDER_ESCAPED"
+fi
+
+exit 0

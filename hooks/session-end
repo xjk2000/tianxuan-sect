@@ -1,0 +1,36 @@
+#!/usr/bin/env bash
+# 道场封存符 - SessionEnd Hook
+# 会话彻底结束时，将待处理队列归档，避免队列无限增长
+
+set -euo pipefail
+
+# 读取 stdin
+INPUT=$(cat)
+
+# 查找天玄宗目录（向上遍历）
+TIANXUAN_DIR=""
+CWD="$(pwd)"
+while [ "$CWD" != "/" ]; do
+  if [ -d "$CWD/天玄宗" ]; then
+    TIANXUAN_DIR="$CWD/天玄宗"
+    break
+  fi
+  CWD="$(dirname "$CWD")"
+done
+
+# 未初始化天玄宗则静默退出
+if [ -z "$TIANXUAN_DIR" ]; then
+  exit 0
+fi
+
+QUEUE_FILE="$TIANXUAN_DIR/道行观照/待处理队列.jsonl"
+
+# 只在队列非空时归档
+if [ -f "$QUEUE_FILE" ] && [ -s "$QUEUE_FILE" ]; then
+  ARCHIVE_DIR="$TIANXUAN_DIR/道行观照/历史队列"
+  mkdir -p "$ARCHIVE_DIR"
+  TIMESTAMP=$(date +"%Y%m%d-%H%M%S")
+  mv "$QUEUE_FILE" "$ARCHIVE_DIR/队列-${TIMESTAMP}.jsonl"
+fi
+
+exit 0

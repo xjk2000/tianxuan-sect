@@ -42,5 +42,6 @@
     "./agents/执法堂长老.md",
     "./agents/杂役弟子.md"
   ],
-  "skills": "./skills/"
+  "skills": "./skills/",
+  "hooks": "./hooks/hooks.json"
 }

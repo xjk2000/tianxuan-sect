@@ -5,21 +5,6 @@
 - Claude Code (最新版本)
 - Git
 - Node.js 16+ (可选，用于运行脚本)
-- Python 3 (用于 hooks 通知脚本)
-- 桌面通知依赖（可选，按平台安装）：
-  - **macOS**：
-    ```bash
-    brew install terminal-notifier
-    ```
-  - **Windows**：安装 BurntToast 模块（以管理员身份打开 PowerShell）：
-    ```powershell
-    Install-Module -Name BurntToast -Force -Scope CurrentUser
-    ```
-  - **Linux**：
-    ```bash
-    sudo apt install libnotify-bin   # Debian/Ubuntu
-    sudo dnf install libnotify       # Fedora
-    ```
 
 ---
 
@@ -220,58 +205,7 @@ rm -rf /path/to/tianxuan-sect
 2. 检查 Agent 文件的 frontmatter 格式是否正确
 3. 重启 Claude Code
 
-### 问题 4: macOS 通知不生效
-
-**症状**: Agent 完成任务后没有桌面通知弹出
-
-**macOS 解决方案**:
-1. 确认已安装 `terminal-notifier`：
-   ```bash
-   brew install terminal-notifier
-   ```
-2. 确认 Python 3 可用：
-   ```bash
-   python3 --version
-   ```
-3. 确认脚本有执行权限：
-   ```bash
-   chmod +x /path/to/tianxuan-sect/hooks/notify.py
-   ```
-4. 手动测试通知脚本：
-   ```bash
-   echo '{"hook_event_name":"Stop","transcript_path":""}' | python3 /path/to/tianxuan-sect/hooks/notify.py
-   ```
-5. 检查系统通知权限：**系统偏好设置 → 通知 → terminal-notifier** → 允许通知
-
-**Windows 解决方案**:
-1. 确认已安装 BurntToast 模块：
-   ```powershell
-   Install-Module -Name BurntToast -Force -Scope CurrentUser
-   ```
-2. 确认 PowerShell 执行策略允许运行脚本：
-   ```powershell
-   Set-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy RemoteSigned
-   ```
-3. 手动测试通知脚本：
-   ```powershell
-   echo '{"hook_event_name":"Stop","transcript_path":""}' | powershell.exe -ExecutionPolicy Bypass -File /path/to/tianxuan-sect/hooks/notify_windows.ps1
-   ```
-4. 检查系统通知权限：**设置 → 系统 → 通知** → 确认通知已开启
-
-**Linux 解决方案**:
-1. 确认已安装 `notify-send`：
-   ```bash
-   sudo apt install libnotify-bin   # Debian/Ubuntu
-   sudo dnf install libnotify       # Fedora
-   ```
-2. 手动测试通知脚本：
-   ```bash
-   echo '{"hook_event_name":"Stop","transcript_path":""}' | python3 /path/to/tianxuan-sect/hooks/notify.py
-   ```
-
----
-
-### 问题 5: Git 克隆失败
+### 问题 4: Git 克隆失败
 
 **症状**: `git clone` 报错
 

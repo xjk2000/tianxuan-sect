@@ -32,9 +32,12 @@ fi
 
 # 检查本次会话是否已有新增道行观照
 OBS_FILE="$TIANXUAN_DIR/道行观照/OBSERVATIONS.md"
+OBS_VOLUME_GLOB="$TIANXUAN_DIR/道行观照/分卷/*.md"
 TODAY=$(date +"%Y-%m-%d")
 TODAY_OBS=0
-if [ -f "$OBS_FILE" ]; then
+if ls $OBS_VOLUME_GLOB >/dev/null 2>&1; then
+  TODAY_OBS=$(grep -h "^## #" $OBS_VOLUME_GLOB 2>/dev/null | wc -l | tr -d ' ' || echo "0")
+elif [ -f "$OBS_FILE" ]; then
   TODAY_OBS=$(grep -c "^## #" "$OBS_FILE" 2>/dev/null | tr -d ' ' || echo "0")
 fi
 

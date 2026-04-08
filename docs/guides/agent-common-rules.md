@@ -32,6 +32,21 @@
 天玄宗/藏经阁/灵脉信息/{项目名}/缺陷分析/{issue-id}.md
 ```
 
+#### 宗门记忆库
+```
+天玄宗/道行观照/OBSERVATIONS.md
+天玄宗/道行观照/分卷/YYYY-MM.md
+天玄宗/宗门记载/SUMMARIES.md
+```
+
+**强制要求**：
+- `天玄宗/道行观照/OBSERVATIONS.md` 仅作为总索引
+- 道行观照完整正文只能写入 `天玄宗/道行观照/分卷/YYYY-MM.md`
+- 宗门记载只能写入 `天玄宗/宗门记载/SUMMARIES.md`
+- 严禁写入 `.tianxuan/observations/OBSERVATIONS.md`
+- 严禁写入 `.tianxuan/summary/SUMMARIES.md`
+- 严禁在任何 `.` 开头目录下创建记忆文件
+
 #### API 契约文档
 ```
 天玄宗/契约中心/API契约/{模块名}-api-spec.yaml

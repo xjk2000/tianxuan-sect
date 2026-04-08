@@ -18,7 +18,8 @@ fi
 memory_section=""
 if [ -d "天玄宗" ]; then
     SUMMARIES_FILE="天玄宗/宗门记载/SUMMARIES.md"
-    OBSERVATIONS_FILE="天玄宗/道行观照/OBSERVATIONS.md"
+    OBSERVATIONS_INDEX_FILE="天玄宗/道行观照/OBSERVATIONS.md"
+    OBSERVATIONS_VOLUME_GLOB="天玄宗/道行观照/分卷/*.md"
     summaries_content=""
     observations_content=""
     obs_total=0
@@ -38,12 +39,21 @@ if [ -d "天玄宗" ]; then
         fi
     fi
 
-    # 道行观照：读取总数 + 最近 20 条的标题索引行（极省 token）
-    if [ -f "$OBSERVATIONS_FILE" ] && [ -s "$OBSERVATIONS_FILE" ]; then
-        obs_total=$(grep -c "^## #" "$OBSERVATIONS_FILE" 2>/dev/null || echo "0")
+    # 道行观照：从分卷读取总数 + 最近 20 条的标题索引行（极省 token）
+    if ls $OBSERVATIONS_VOLUME_GLOB >/dev/null 2>&1; then
+        obs_total=$(grep -h "^## #" $OBSERVATIONS_VOLUME_GLOB 2>/dev/null | wc -l | tr -d ' ' || echo "0")
         if [ "$obs_total" -gt 0 ]; then
             # 只取标题行（## #编号 · 日期 · 长老 · 类型）和下一行（**标题**）
-            observations_content=$(grep -A1 "^## #" "$OBSERVATIONS_FILE" 2>/dev/null \
+            observations_content=$(grep -h -A1 "^## #" $OBSERVATIONS_VOLUME_GLOB 2>/dev/null \
+                | grep -v "^--$" \
+                | tail -n 40 \
+                || echo "")
+        fi
+    elif [ -f "$OBSERVATIONS_INDEX_FILE" ] && [ -s "$OBSERVATIONS_INDEX_FILE" ]; then
+        # 兼容旧版单文件结构
+        obs_total=$(grep -c "^## #" "$OBSERVATIONS_INDEX_FILE" 2>/dev/null || echo "0")
+        if [ "$obs_total" -gt 0 ]; then
+            observations_content=$(grep -A1 "^## #" "$OBSERVATIONS_INDEX_FILE" 2>/dev/null \
                 | grep -v "^--$" \
                 | tail -n 40 \
                 || echo "")
